@@ -31,7 +31,6 @@ services:
       SWARM_CLIENT_EXECUTORS: 2
       JENKINS_USERNAME: admin
       JENKINS_PASSWORD: admin_password
-      AGENT_NAME: "java-slave-938c5d46"
     depends_on:
       - jenkins-master
 
