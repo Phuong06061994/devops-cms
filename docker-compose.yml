@@ -1,0 +1,55 @@
+version: '3.8'
+
+networks:
+  jenkins_network:
+    driver: bridge
+
+services:
+  jenkins-master:
+    build: ./jenkins-master
+    container_name: jenkins-master
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    networks:
+      - jenkins_network
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    environment:
+      JENKINS_ADMIN_ID: admin
+      JENKINS_ADMIN_PASSWORD: admin_password
+
+  java-slave:
+    build: ./java-slave
+    container_name: java-slave
+    networks:
+      - jenkins_network
+    environment:
+      JENKINS_MASTER_URL: http://jenkins-master:8080
+      SWARM_CLIENT_NAME: java-slave
+      SWARM_CLIENT_LABELS: "java"
+      SWARM_CLIENT_EXECUTORS: 2
+      JENKINS_USERNAME: admin
+      JENKINS_PASSWORD: admin_password
+      AGENT_NAME: "java-slave-938c5d46"
+    depends_on:
+      - jenkins-master
+
+  node-slave:
+    build: ./node-slave
+    container_name: node-slave
+    networks:
+      - jenkins_network
+    environment:
+      JENKINS_MASTER_URL: http://jenkins-master:8080
+      SWARM_CLIENT_NAME: node-slave
+      SWARM_CLIENT_LABELS: "node"
+      SWARM_CLIENT_EXECUTORS: 2
+      JENKINS_USERNAME: admin
+      JENKINS_PASSWORD: admin_password
+    depends_on:
+      - jenkins-master
+
+volumes:
+  jenkins_home:
+
