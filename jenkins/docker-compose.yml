@@ -19,15 +19,17 @@ services:
       JENKINS_ADMIN_ID: admin
       JENKINS_ADMIN_PASSWORD: admin_password
 
-  java-slave:
-    build: ./java-slave
-    container_name: java-slave
+  net-slave:
+    build: ./net-slave
+    container_name: net-slave
+    ports:
+      - "5000:5000"
     networks:
       - jenkins_network
     environment:
       JENKINS_MASTER_URL: http://jenkins-master:8080
-      SWARM_CLIENT_NAME: java-slave
-      SWARM_CLIENT_LABELS: "java"
+      SWARM_CLIENT_NAME: net-slave
+      SWARM_CLIENT_LABELS: "net"
       SWARM_CLIENT_EXECUTORS: 2
       JENKINS_USERNAME: admin
       JENKINS_PASSWORD: admin_password
@@ -37,6 +39,8 @@ services:
   node-slave:
     build: ./node-slave
     container_name: node-slave
+    ports:
+      - "3000:3000"
     networks:
       - jenkins_network
     environment:

@@ -1,33 +1,20 @@
 # Use the .NET 8 SDK as the base image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
-# Install necessary tools
+# Install necessary tools and Java
 USER root
 RUN apt-get update && \
-    apt-get install -y wget curl git && \
+    apt-get install -y wget curl git openjdk-11-jdk && \
     rm -rf /var/lib/apt/lists/*
 
 # Install the Jenkins Swarm client
 RUN wget -q -O /usr/local/bin/swarm-client.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.26/swarm-client-3.26.jar && \
     chmod +x /usr/local/bin/swarm-client.jar
 
-# Install sdkman (optional, depending on your needs)
-RUN curl -s "https://get.sdkman.io" > install_sdkman.sh && \
-    bash install_sdkman.sh && \
-    rm install_sdkman.sh && \
-    echo "source $HOME/.sdkman/bin/sdkman-init.sh" >> $HOME/.bashrc
-
-# Install Groovy using sdkman (optional)
-RUN bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && sdk install groovy 3.0.9"
-
-# Set Groovy environment variables (optional)
-ENV GROOVY_HOME="/root/.sdkman/candidates/groovy/current"
-ENV PATH="${GROOVY_HOME}/bin:${PATH}"
-
 # Set environment variables for Jenkins Swarm client configuration
 ENV JENKINS_MASTER_URL=http://jenkins-master:8080 \
-    SWARM_CLIENT_NAME=java-slave \
-    SWARM_CLIENT_LABELS="java" \
+    SWARM_CLIENT_NAME=net-slave \
+    SWARM_CLIENT_LABELS="net" \
     SWARM_CLIENT_EXECUTORS=2 \
     JENKINS_USERNAME=admin \
     JENKINS_PASSWORD=admin_password
@@ -38,4 +25,3 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the entrypoint to the shared script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
