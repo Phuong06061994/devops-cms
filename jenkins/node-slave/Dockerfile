@@ -30,6 +30,3 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Set the entrypoint to the shared script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Optionally set a default CMD if needed
-# CMD ["node", "your_script.js"]
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

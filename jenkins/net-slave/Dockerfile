@@ -1,11 +1,12 @@
 # Use the .NET 8 SDK as the base image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
-# Install necessary tools and Java
-USER root
+# Install necessary tools and Java 17
 RUN apt-get update && \
-    apt-get install -y wget curl git openjdk-11-jdk && \
+    apt-get install -y --no-install-recommends openjdk-17-jdk git curl wget && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Install the Jenkins Swarm client
 RUN wget -q -O /usr/local/bin/swarm-client.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.26/swarm-client-3.26.jar && \
