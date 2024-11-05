@@ -1,15 +1,25 @@
+# Use the official Jenkins LTS image
 FROM jenkins/jenkins:lts
 
-# Switch to root user
+# Switch to the root user to install plugins
 USER root
 
-# Install the Swarm plugin using jenkins-plugin-cli
-RUN jenkins-plugin-cli --plugins swarm
+RUN apt-get update && apt-get install -y jq
 
-# Expose Jenkins default ports
+# Install necessary packages for managing Jenkins plugins
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean
+
+# Install the Swarm plugin and any other necessary plugins using the Jenkins CLI
+RUN jenkins-plugin-cli --plugins swarm:latest
+
+RUN jenkins-plugin-cli --plugins instance-identity:185.v303dc7c645f9
+
+# Expose the necessary ports
 EXPOSE 8080 50000
 
-# Set environment variables for initial admin user setup
-ENV JENKINS_ADMIN_ID=admin
-ENV JENKINS_ADMIN_PASSWORD=admin_password
+# Start Jenkins
+ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
+
 
