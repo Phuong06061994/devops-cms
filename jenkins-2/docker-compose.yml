@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  jenkins-master:
+    build: ./jenkins-master
+    container_name: jenkins-master
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - jenkins-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nodejs-slave:
+    build: ./nodejs-slave
+    container_name: nodejs-slave
+    networks:
+      - jenkins-network
+    environment:
+      - JENKINS_URL=http://jenkins-master:8080
+      - JENKINS_AGENT_NAME=nodejs-slave
+    depends_on:
+      jenkins-master:
+        condition: service_healthy
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    ports:
+      - "3000:3000" # Exposing React app on port 3000
+
+  java-slave:
+    build: ./java-slave
+    container_name: java-slave
+    networks:
+      - jenkins-network
+    environment:
+      - JENKINS_URL=http://jenkins-master:8080
+      - JENKINS_AGENT_NAME=java-slave
+    depends_on:
+      jenkins-master:
+        condition: service_healthy
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    ports:
+      - "8081:8080" # Exposing Java app on port 8081
+
+networks:
+  jenkins-network:
+    driver: bridge
+
+volumes:
+  jenkins_home:
