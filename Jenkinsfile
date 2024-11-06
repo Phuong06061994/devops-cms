@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {lable 'java-slave-082dc27b'}
 
     stages {
         stage('Build') {
