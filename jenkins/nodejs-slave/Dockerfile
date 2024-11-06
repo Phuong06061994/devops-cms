@@ -1,16 +1,17 @@
 FROM jenkins/inbound-agent:latest
 
 # Set the working directory
-WORKDIR /home/javaApp
+WORKDIR /home/reactApp
 
-# Copy all source code to /home/javaApp
+# Copy all source code to /home/reactApp
 COPY . .
 
 USER root
 
-# Install Java JDK and Maven
-RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk maven && \
+# Install Node.js, Java, Maven, and other dependencies
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get update && \
+    apt-get install -y nodejs jq openjdk-17-jdk maven curl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -25,4 +26,5 @@ ENV JENKINS_URL=http://jenkins-master:8080
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Set the entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

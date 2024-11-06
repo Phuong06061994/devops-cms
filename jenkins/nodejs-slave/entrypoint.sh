@@ -29,9 +29,9 @@ if [ ! -f "$SWARM_CLIENT_JAR" ]; then
     exit 1
 fi
 
-AGENT_NAME="java-slave"
+AGENT_NAME="nodejs-slave"
 
-# Start the Jenkins agent using JNLP (Java Network Launch Protocol)
+# Start the Jenkins agent with the API token
 echo "Starting Jenkins agent..."
 java -jar "$SWARM_CLIENT_JAR" \
     -master "${JENKINS_URL}" \
@@ -47,7 +47,6 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Jenkins agent started successfully."
-
 
 # Optional: If you want to keep this script running, you might want to add a wait command
 # while true; do sleep 1000; done
