@@ -18,23 +18,25 @@ services:
     environment:
       JENKINS_ADMIN_ID: admin
       JENKINS_ADMIN_PASSWORD: admin_password
+    entrypoint: /bin/bash -c "chmod -R 444 /var/jenkins_home && /usr/local/bin/jenkins.sh"
 
-  net-slave:
-    build: ./net-slave
-    container_name: net-slave
+  java-slave:
+    build: ./java-slave
+    container_name: java-slave
     ports:
       - "5000:5000"
     networks:
       - jenkins_network
     environment:
       JENKINS_MASTER_URL: http://jenkins-master:8080
-      SWARM_CLIENT_NAME: net-slave
-      SWARM_CLIENT_LABELS: "net"
+      SWARM_CLIENT_NAME: java-slave
+      SWARM_CLIENT_LABELS: "java"
       SWARM_CLIENT_EXECUTORS: 2
       JENKINS_USERNAME: admin
-      JENKINS_PASSWORD: admin_password
     depends_on:
       - jenkins-master
+    volumes:
+      - jenkins_home:/var/jenkins_home
 
   node-slave:
     build: ./node-slave
@@ -49,10 +51,10 @@ services:
       SWARM_CLIENT_LABELS: "node"
       SWARM_CLIENT_EXECUTORS: 2
       JENKINS_USERNAME: admin
-      JENKINS_PASSWORD: admin_password
     depends_on:
       - jenkins-master
+    volumes:
+      - jenkins_home:/var/jenkins_home
 
 volumes:
   jenkins_home:
-
