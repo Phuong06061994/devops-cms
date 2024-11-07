@@ -11,9 +11,6 @@ RUN apt-get update && \
     apt-get install -y curl && \
     apt-get clean
 
-# Switch back to the Jenkins user
-USER jenkins
-
 # Install the Swarm plugin and any other necessary plugins using the Jenkins CLI
 RUN jenkins-plugin-cli --plugins swarm:latest
 
@@ -24,3 +21,5 @@ EXPOSE 8080 50000
 
 # Start Jenkins
 ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
+
+
