@@ -12,7 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and set up the Jenkins Swarm client
-RUN wget -q -O /usr/local/bin/swarm-client.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.26/swarm-client-3.26.jar && \
+RUN wget -q -O /usr/local/bin/swarm-client.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.44/swarm-client-3.44.jar && \
     chmod +x /usr/local/bin/swarm-client.jar
 
 # Set environment variables for Jenkins Swarm client configuration

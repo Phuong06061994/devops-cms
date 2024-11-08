@@ -1,54 +1,24 @@
 #!/bin/bash
 
-# Fail fast on errors
-set -e
+# Define the path to the initialAdminPassword file
+FILE_PATH="/var/jenkins_home/secrets/initialAdminPassword"
 
-# Wait for Jenkins master to be ready
-echo "Waiting for Jenkins master to be ready..."
-until curl -s "${JENKINS_URL}/login" > /dev/null; do
-    sleep 5
-done
-
-# Wait a little longer to ensure Jenkins is fully initialized
-echo "Waiting for Jenkins master to fully initialize..."
-sleep 10  # Adjust this time as necessary
-
-
-# Retrieve the initial admin password
-JENKINS_ADMIN_PASSWORD=$(cat /var/jenkins_home/secrets/initialAdminPassword)
-
-# Download the Swarm client if it doesn't exist
-SWARM_CLIENT_JAR="/usr/share/jenkins/swarm-client.jar"
-if [ ! -f "$SWARM_CLIENT_JAR" ]; then
-    echo "Downloading Swarm client..."
-    curl -o "$SWARM_CLIENT_JAR" "${JENKINS_URL}/swarm/swarm-client.jar"
+# Check if the file exists
+if [ -f "$FILE_PATH" ]; then
+  # Read and store the contents of the file
+  echo "Retrieving Jenkins admin password..."
+  JENKINS_ADMIN_PASSWORD=$(cat "$FILE_PATH")
+  echo "Admin password retrieved: $JENKINS_ADMIN_PASSWORD"
+else
+  JENKINS_USERNAME="phuongnv63"
+  JENKINS_ADMIN_PASSWORD="123456"
+  echo "File $FILE_PATH does not exist. Exiting..."
 fi
 
-# Ensure the Swarm client was downloaded successfully
-if [ ! -f "$SWARM_CLIENT_JAR" ]; then
-    echo "Error: Unable to access jarfile $SWARM_CLIENT_JAR. Exiting."
-    exit 1
-fi
-
-AGENT_NAME="nodejs-slave"
-
-# Start the Jenkins agent with the API token
-echo "Starting Jenkins agent..."
-java -jar "$SWARM_CLIENT_JAR" \
-    -master "${JENKINS_URL}" \
-    -username "admin" \
-    -password "${JENKINS_ADMIN_PASSWORD}" \
-    -name "${AGENT_NAME}" \
-    -workDir "/home/jenkins"
-
-# Check if the agent started successfully
-if [ $? -ne 0 ]; then
-    echo "Failed to start Jenkins agent. Exiting."
-    exit 1
-fi
-
-echo "Jenkins agent started successfully."
-
-# Optional: If you want to keep this script running, you might want to add a wait command
-# while true; do sleep 1000; done
-
+exec java -jar /usr/local/bin/swarm-client.jar \
+      -master "${JENKINS_MASTER_URL}" \
+      -labels "${SWARM_CLIENT_LABELS}" \
+      -username "${JENKINS_USERNAME}" \
+      -password "${JENKINS_ADMIN_PASSWORD}" \
+      -name "${SWARM_CLIENT_NAME}" \
+      -workDir "/home/jenkins"
