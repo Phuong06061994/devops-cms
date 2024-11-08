@@ -1,13 +1,20 @@
 # Use a Node.js base image
-# Use a Node.js base image
 FROM node:18
 
-# Set the working directory
-WORKDIR /usr/src/app
-
-# Install necessary tools and Java 17
+# Install necessary tools, Docker, and download the latest Jenkins Swarm client
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-17-jdk git curl wget && \
+    apt-get install -y wget curl git apt-transport-https ca-certificates lsb-release && \
+    # Add Docker's official GPG key and setup the Docker stable repository
+    curl -fsSL https://download.docker.com/linux/debian/gpg | tee /etc/apt/trusted.gpg.d/docker.asc && \
+    echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list && \
+    apt-get update && \
+    apt-get install -y docker-ce docker-ce-cli containerd.io && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Java 17
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openjdk-17-jdk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -29,4 +36,3 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the entrypoint to the shared script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
