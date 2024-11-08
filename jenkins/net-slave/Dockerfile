@@ -1,4 +1,5 @@
 FROM openjdk:17-jdk-slim
+USER root
 # Install necessary tools and Jenkins Swarm client
 RUN apt-get update && \
     apt-get install -y wget curl git && \
