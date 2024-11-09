@@ -45,7 +45,7 @@ services:
       - backend
 
   nginx:
-    build: ./nginx.conf
+    image: nginx:latest
     container_name: nginx-proxy
     ports:
       - "80:80"
@@ -55,6 +55,8 @@ services:
     depends_on:
       - frontend
       - backend
-
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d
+    
 volumes:
   postgres_data:
