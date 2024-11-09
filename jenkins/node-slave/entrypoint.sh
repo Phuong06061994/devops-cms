@@ -15,10 +15,12 @@ else
   echo "File $FILE_PATH does not exist. Exiting..."
 fi
 
+# Execute Jenkins Swarm client with the necessary configuration
 exec java -jar /usr/local/bin/swarm-client.jar \
       -master "${JENKINS_MASTER_URL}" \
       -labels "${SWARM_CLIENT_LABELS}" \
       -username "${JENKINS_USERNAME}" \
       -password "${JENKINS_ADMIN_PASSWORD}" \
       -name "${SWARM_CLIENT_NAME}" \
-      -workDir "/home/jenkins"
+      -workDir "/home/jenkins" \
+      -disableClientsUniqueId

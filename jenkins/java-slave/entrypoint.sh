@@ -29,4 +29,5 @@ exec java -jar /usr/local/bin/swarm-client.jar \
       -username "${JENKINS_USERNAME}" \
       -password "${JENKINS_ADMIN_PASSWORD}" \
       -name "${SWARM_CLIENT_NAME}" \
-      -workDir "/home/jenkins"
+      -workDir "/home/jenkins" \
+      -disableClientsUniqueId
