@@ -10,7 +10,7 @@ pipeline {
         NODE_GIT_REPO_URL = 'https://github.com/Phuong06061994/angular-demo.git'
         REMOTE_HOST = 'ec2-user@ec2-54-174-102-199.compute-1.amazonaws.com'
         SSH_CREDENTIALS = 'ec2-credential'
-        REMOTE_COMPOSE_PATH = '/home/ec2-user/angular-demo'
+        REMOTE_COMPOSE_PATH = '/home/ec2-user/build-app'
         JAVA_IMAGE_TAG = ''
         NODE_IMAGE_TAG = ''
     }
