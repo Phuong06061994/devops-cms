@@ -136,8 +136,6 @@ pipeline {
                         sh """
                             ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
                                 cd ${REMOTE_COMPOSE_PATH}
-                                docker-compose down
-                                docker-compose pull
                                 docker-compose up -d
                             '
                         """
