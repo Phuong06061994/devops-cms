@@ -145,7 +145,9 @@ pipeline {
 
     post {
         always {
-            sh "docker system prune -af"
+            node {
+                sh "docker system prune -af"
+            }
         }
     }
 }
