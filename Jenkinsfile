@@ -104,8 +104,6 @@ pipeline {
             agent { label 'java-slave' }
             steps {
                 checkout scm
-            }
-            steps {
                 script {
                     sh """
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
@@ -123,7 +121,7 @@ pipeline {
                         sh """
                             ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
                             scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
-                            scp -r StrictHostKeyChecking=no nginx.conf/ ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/nginx.conf/
+                            scp -r -o StrictHostKeyChecking=no nginx.conf/ ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/nginx.conf/
                         """
                     }
                 }
@@ -148,7 +146,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             node('java-slave') {
