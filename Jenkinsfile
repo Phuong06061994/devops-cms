@@ -136,6 +136,8 @@ pipeline {
                         sh """
                             ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
                                 cd ${REMOTE_COMPOSE_PATH}
+                                docker stop $(docker ps -q)
+                                docker rm $(docker ps -a -q)
                                 docker-compose up -d
                             '
                         """
