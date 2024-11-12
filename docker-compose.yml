@@ -18,7 +18,7 @@ services:
       - app_network  
 
   backend:
-    image: phuong06061994/java-demo:1be12d
+    image: phuong06061994/java-demo:tag
     container_name: backend-app
     ports:
       - "50002:8080"
@@ -28,7 +28,7 @@ services:
       - postgres
 
   frontend:
-    image: phuong06061994/angular-demo:ad8bb2
+    image: phuong06061994/angular-demo:tag
     container_name: frontend-app
     ports:
       - "3000:80"
