@@ -101,6 +101,7 @@ pipeline {
         }
 
         stage('Update docker-compose.yml with Image Tags') {
+            agent { label 'java-slave' }
             steps {
                 script {
                     sh """
@@ -112,6 +113,7 @@ pipeline {
         }
 
         stage('Prepare Remote Directory and Copy docker-compose.yml') {
+            agent { label 'java-slave' }
             steps {
                 script {
                     sshagent([SSH_CREDENTIALS]) {
@@ -125,6 +127,7 @@ pipeline {
         }
 
         stage('Deploy on Remote Host') {
+            agent { label 'java-slave' }
             steps {
                 script {
                     sshagent([SSH_CREDENTIALS]) {
@@ -141,8 +144,8 @@ pipeline {
             }
         }
     }
-
-     post {
+    
+    post {
         always {
             sh "docker system prune -af"
         }
