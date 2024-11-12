@@ -11,8 +11,6 @@ pipeline {
         REMOTE_HOST = 'ec2-user@ec2-54-174-102-199.compute-1.amazonaws.com'
         SSH_CREDENTIALS = 'ec2-credential'
         REMOTE_COMPOSE_PATH = '/home/ec2-user/build-app'
-        JAVA_IMAGE_TAG = ''
-        NODE_IMAGE_TAG = ''
     }
 
     stages {
@@ -29,29 +27,23 @@ pipeline {
                         stage('Set Java Image Tag') {
                             steps {
                                 script {
-                                    JAVA_IMAGE_TAG = sh(script: "git rev-parse --short=6 HEAD", returnStdout: true).trim()
+                                    env.JAVA_IMAGE_TAG = sh(script: "git rev-parse --short=6 HEAD", returnStdout: true).trim()
                                     echo "Java Image Tag: ${JAVA_IMAGE_TAG}"
                                 }
                             }
                         }
                         stage('Build Java Docker Image') {
                             steps {
-                                script {
-                                    sh """
-                                        docker build -t ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG} -f my-app/Dockerfile my-app
-                                    """
-                                }
+                                sh "docker build -t ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG} -f my-app/Dockerfile my-app"
                             }
                         }
                         stage('Push Java Docker Image') {
                             steps {
-                                script {
-                                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                                        sh """
-                                            echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
-                                            docker push ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}
-                                        """
-                                    }
+                                withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                    sh """
+                                        echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
+                                        docker push ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}
+                                    """
                                 }
                             }
                         }
@@ -69,29 +61,23 @@ pipeline {
                         stage('Set Node Image Tag') {
                             steps {
                                 script {
-                                    NODE_IMAGE_TAG = sh(script: "git rev-parse --short=6 HEAD", returnStdout: true).trim()
+                                    env.NODE_IMAGE_TAG = sh(script: "git rev-parse --short=6 HEAD", returnStdout: true).trim()
                                     echo "Node Image Tag: ${NODE_IMAGE_TAG}"
                                 }
                             }
                         }
                         stage('Build Node Docker Image') {
                             steps {
-                                script {
-                                    sh """
-                                        docker build -t ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG} -f my-app/Dockerfile my-app
-                                    """
-                                }
+                                sh "docker build -t ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG} -f my-app/Dockerfile my-app"
                             }
                         }
                         stage('Push Node Docker Image') {
                             steps {
-                                script {
-                                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                                        sh """
-                                            echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
-                                            docker push ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}
-                                        """
-                                    }
+                                withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                    sh """
+                                        echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
+                                        docker push ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}
+                                    """
                                 }
                             }
                         }
@@ -105,41 +91,21 @@ pipeline {
             steps {
                 checkout scm
                 script {
-                    // Debugging: Print the tags to make sure they are correctly set
                     echo "Java Image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}"
                     echo "Node Image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}"
 
-                    // Update docker-compose.yml with the correct image tags
                     sh """
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
                         sed -i 's|image: phuong06061994/angular-demo:.*|image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}|' docker-compose.yml
+                        
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
+                        
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'rm -f ${REMOTE_COMPOSE_PATH}/docker-compose.yml'
+                        
+                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
+                        scp -r -o StrictHostKeyChecking=no nginx.conf/ ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/nginx.conf/
                     """
-                    
-                    // Debugging: Print out the docker-compose.yml to verify the changes
                     sh 'cat docker-compose.yml'
-                }
-            }
-        }
-
-        stage('Prepare Remote Directory and Copy Files') {
-            agent { label 'java-slave' }
-            steps {
-                script {
-                    sshagent([SSH_CREDENTIALS]) {
-                        sh """
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
-
-                            # Remove the existing docker-compose.yml file if it exists
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'rm -f ${REMOTE_COMPOSE_PATH}/docker-compose.yml'
-                            
-                            # Copy the updated docker-compose.yml and nginx.conf to the remote host
-                            scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
-                            scp -r -o StrictHostKeyChecking=no nginx.conf/ ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/nginx.conf/
-                            
-                            # Display the contents of the docker-compose.yml file on the remote server
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'cat ${REMOTE_COMPOSE_PATH}/docker-compose.yml'
-                        """
-                    }
                 }
             }
         }
@@ -147,17 +113,14 @@ pipeline {
         stage('Deploy on Remote Host') {
             agent { label 'java-slave' }
             steps {
-                script {
-                    sshagent([SSH_CREDENTIALS]) {
-                        sh """
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} \'
-                                cd ${REMOTE_COMPOSE_PATH}
-                                docker stop \$(docker ps -q)
-                                docker rm \$(docker ps -a -q)
-                                docker-compose up -d
-                            \'
-                        """
-                    }
+                sshagent([SSH_CREDENTIALS]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
+                            cd ${REMOTE_COMPOSE_PATH}
+                            docker-compose down
+                            docker-compose up -d
+                        '
+                    """
                 }
             }
         }
@@ -165,7 +128,8 @@ pipeline {
 
     post {
         always {
-            node('java-slave') {
+            agent { label 'java-slave' }
+            steps {
                 sh "docker system prune -af"
             }
         }
