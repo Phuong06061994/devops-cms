@@ -105,7 +105,7 @@ pipeline {
             steps {
                 checkout scm
                 script {
-                    // Debugging: Print the tags
+                    // Debugging: Print the tags to make sure they are correctly set
                     echo "Java Image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}"
                     echo "Node Image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}"
 
@@ -113,6 +113,8 @@ pipeline {
                     sh """
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
                         sed -i 's|image: phuong06061994/angular-demo:.*|image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}|' docker-compose.yml
+                        # Print the contents of docker-compose.yml after sed
+                        cat docker-compose.yml
                     """
                 }
             }
@@ -123,6 +125,11 @@ pipeline {
             steps {
                 script {
                     sshagent([SSH_CREDENTIALS]) {
+                        // Debugging: Print the contents of docker-compose.yml before copying
+                        sh """
+                            echo "Contents of docker-compose.yml before copying:"
+                            cat docker-compose.yml
+                        """
                         sh """
                             ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
                             scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
