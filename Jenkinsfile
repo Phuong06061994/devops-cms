@@ -23,7 +23,7 @@ pipeline {
                     stages {
                         stage('Checkout Java Code') {
                             steps {
-                                git url: JAVA_GIT_REPO_URL, credentialsId: GIT_CREDENTIALS
+                                git url: JAVA_GIT_REPO_URL, credentialsId: GIT_CREDENTIALS, branch: 'main'
                             }
                         }
                         stage('Set Java Image Tag') {
@@ -63,7 +63,7 @@ pipeline {
                     stages {
                         stage('Checkout Node Code') {
                             steps {
-                                git url: NODE_GIT_REPO_URL, credentialsId: GIT_CREDENTIALS
+                                git url: NODE_GIT_REPO_URL, credentialsId: GIT_CREDENTIALS, branch: 'main'
                             }
                         }
                         stage('Set Node Image Tag') {
