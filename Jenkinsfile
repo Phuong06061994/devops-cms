@@ -128,24 +128,24 @@ pipeline {
             }
         }
 
-        stage('Deploy on Remote Host') {
+       stage('Deploy on Remote Host') {
             agent { label 'java-slave' }
             steps {
                 script {
                     sshagent([SSH_CREDENTIALS]) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} '
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} \'
                                 cd ${REMOTE_COMPOSE_PATH}
-                                docker stop $(docker ps -q)
-                                docker rm $(docker ps -a -q)
+                                docker stop \$(docker ps -q)
+                                docker rm \$(docker ps -a -q)
                                 docker-compose up -d
-                            '
+                            \'
                         """
                     }
                 }
             }
         }
-    }
+
 
     post {
         always {
