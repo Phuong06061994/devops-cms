@@ -128,7 +128,7 @@ pipeline {
             }
         }
 
-       stage('Deploy on Remote Host') {
+        stage('Deploy on Remote Host') {
             agent { label 'java-slave' }
             steps {
                 script {
@@ -145,7 +145,7 @@ pipeline {
                 }
             }
         }
-
+    }
 
     post {
         always {
