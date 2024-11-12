@@ -113,27 +113,28 @@ pipeline {
                     sh """
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
                         sed -i 's|image: phuong06061994/angular-demo:.*|image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}|' docker-compose.yml
-                        # Print the contents of docker-compose.yml after sed
-                        cat docker-compose.yml
                     """
                 }
             }
         }
 
-        stage('Prepare Remote Directory and Copy docker-compose.yml') {
+        stage('Prepare Remote Directory and Copy Files') {
             agent { label 'java-slave' }
             steps {
                 script {
                     sshagent([SSH_CREDENTIALS]) {
-                        // Debugging: Print the contents of docker-compose.yml before copying
-                        sh """
-                            echo "Contents of docker-compose.yml before copying:"
-                            cat docker-compose.yml
-                        """
                         sh """
                             ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
+
+                            # Remove the existing docker-compose.yml file if it exists
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'rm -f ${REMOTE_COMPOSE_PATH}/docker-compose.yml'
+                            
+                            # Copy the updated docker-compose.yml and nginx.conf to the remote host
                             scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
                             scp -r -o StrictHostKeyChecking=no nginx.conf/ ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/nginx.conf/
+                            
+                            # Display the contents of the docker-compose.yml file on the remote server
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'cat ${REMOTE_COMPOSE_PATH}/docker-compose.yml'
                         """
                     }
                 }
