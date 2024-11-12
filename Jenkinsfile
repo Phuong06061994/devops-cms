@@ -105,6 +105,11 @@ pipeline {
             steps {
                 checkout scm
                 script {
+                    // Debugging: Print the tags
+                    echo "Java Image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}"
+                    echo "Node Image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}"
+
+                    // Update docker-compose.yml with the correct image tags
                     sh """
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
                         sed -i 's|image: phuong06061994/angular-demo:.*|image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}|' docker-compose.yml
