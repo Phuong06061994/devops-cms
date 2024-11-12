@@ -101,7 +101,6 @@ pipeline {
         }
 
         stage('Update docker-compose.yml with Image Tags') {
-            agent any
             steps {
                 script {
                     sh """
