@@ -147,7 +147,6 @@ pipeline {
     
     post {
         always {
-            sh "docker system prune -af"
             node('java-slave') {
                 sh "docker system prune -af"
             }
