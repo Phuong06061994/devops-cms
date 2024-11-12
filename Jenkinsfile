@@ -114,6 +114,9 @@ pipeline {
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
                         sed -i 's|image: phuong06061994/angular-demo:.*|image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}|' docker-compose.yml
                     """
+                    
+                    // Debugging: Print out the docker-compose.yml to verify the changes
+                    sh 'cat docker-compose.yml'
                 }
             }
         }
