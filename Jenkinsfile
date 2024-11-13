@@ -8,7 +8,7 @@ pipeline {
         GIT_CREDENTIALS = 'github-credential'
         JAVA_GIT_REPO_URL = 'https://github.com/Phuong06061994/java-demo.git'
         NODE_GIT_REPO_URL = 'https://github.com/Phuong06061994/angular-demo.git'
-        REMOTE_HOST = 'ec2-user@ec2-54-174-102-199.compute-1.amazonaws.com'
+        REMOTE_HOST = 'ec2-user@ec2-44-206-232-108.compute-1.amazonaws.com'
         SSH_CREDENTIALS = 'ec2-credential'
         REMOTE_COMPOSE_PATH = '/home/ec2-user/build-app'
     }
@@ -89,23 +89,35 @@ pipeline {
         stage('Update docker-compose.yml with Image Tags') {
             agent { label 'java-slave' }
             steps {
-                checkout scm
                 script {
-                    echo "Java Image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}"
-                    echo "Node Image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}"
-
+                    // Update image tags in docker-compose.yml
                     sh """
                         sed -i 's|image: phuong06061994/java-demo:.*|image: ${JAVA_IMAGE_NAME}:${JAVA_IMAGE_TAG}|' docker-compose.yml
                         sed -i 's|image: phuong06061994/angular-demo:.*|image: ${NODE_IMAGE_NAME}:${NODE_IMAGE_TAG}|' docker-compose.yml
-                        
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
-                        
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'rm -f ${REMOTE_COMPOSE_PATH}/docker-compose.yml'
-                        
-                        scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
-                        scp -r -o StrictHostKeyChecking=no nginx.conf/ ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/nginx.conf/
                     """
-                    sh 'cat docker-compose.yml'
+
+                    // Capture the updated file content
+                    def composeFileContent = readFile 'docker-compose.yml'
+                    echo "Updated docker-compose.yml:\n${composeFileContent}"
+
+                    // Store it for later use
+                    env.COMPOSE_FILE_CONTENT = composeFileContent
+                }
+            }
+        }
+
+        stage('Transfer docker-compose.yml to Remote Host') {
+            agent { label 'java-slave' }
+            steps {
+                sshagent([SSH_CREDENTIALS]) {
+                    script {
+                        // Recreate docker-compose.yml on the remote host using the captured content
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${REMOTE_HOST} 'mkdir -p ${REMOTE_COMPOSE_PATH}'
+                            echo "\$COMPOSE_FILE_CONTENT" > docker-compose.yml
+                            scp -o StrictHostKeyChecking=no docker-compose.yml ${REMOTE_HOST}:${REMOTE_COMPOSE_PATH}/docker-compose.yml
+                        """
+                    }
                 }
             }
         }
