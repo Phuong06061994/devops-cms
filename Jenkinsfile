@@ -137,13 +137,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            agent { label 'java-slave' }
-            steps {
-                sh "docker system prune -af"
-            }
-        }
-    }
 }
