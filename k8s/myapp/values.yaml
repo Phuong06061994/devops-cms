@@ -1,0 +1,41 @@
+nginx:
+  replicaCount: 1
+  image:
+    repository: nginx
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "latest"
+  postgresqlUsername: user
+  postgresqlPassword: password
+  postgresqlDatabase: mydb
+  service:
+    type: ClusterIP
+    port: 5432
+    targetPort: 5432
+    
+service:
+  type: ClusterIP   # You can change this to NodePort or LoadBalancer if needed
+  port: 80          # The port that the service will expose
+
+serviceAccount:
+  create: false
+  name: ""
+ingress:
+  enabled: false     # Set this to 'false' if you don't want to enable ingress
+  # Optionally, provide other Ingress-related values here
+  name: ""
+  annotations: {}
+  paths: []
+autoscaling:
+  enabled: false     # Set to 'false' if you don't want to enable autoscaling
+  minReplicas: 1    # Minimum number of replicas for autoscaling
+  maxReplicas: 5    # Maximum number of replicas for autoscaling
+  targetCPUUtilizationPercentage: 80  # Target CPU utilization percentage
