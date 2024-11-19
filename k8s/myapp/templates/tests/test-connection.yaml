@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "myapp.fullname" . }}-test-connection"
+  labels:
+    {{- include "myapp.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      # Use the correct path to access the nginx or postgresql port
+      args: ['{{ include "myapp.fullname" . }}:{{ .Values.nginx.service.port }}'] # or .Values.postgresql.service.port
+  restartPolicy: Never
