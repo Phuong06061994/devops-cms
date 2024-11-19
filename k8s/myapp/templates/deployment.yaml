@@ -13,10 +13,6 @@ spec:
         app: myapp
     spec:
       containers:
-        - name: nginx
-          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
-          ports:
-            - containerPort: {{ .Values.nginx.service.port }}
         - name: postgresql
           image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
           env:
@@ -28,3 +24,20 @@ spec:
               value: "{{ .Values.postgresql.postgresqlDatabase }}"
           ports:
             - containerPort: {{ .Values.postgresql.service.port }}
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          env:
+            # Pass JDBC-related environment variables to backend service
+            - name: JDBC_DATABASE_USERNAME
+              value: "{{ .Values.postgresql.postgresqlUsername }}"
+            - name: JDBC_DATABASE_PASSWORD
+              value: "{{ .Values.postgresql.postgresqlPassword }}"
+            - name: JDBC_DATABASE_URL
+              value: "{{ .Values.backend.url }}"
+          ports:
+            - containerPort: {{ .Values.backend.service.port }}
+        - name: frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.frontend.service.targetPort }}
+        

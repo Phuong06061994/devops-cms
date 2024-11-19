@@ -11,6 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      # Use the correct path to access the nginx or postgresql port
-      args: ['{{ include "myapp.fullname" . }}:{{ .Values.nginx.service.port }}'] # or .Values.postgresql.service.port
+      args: ['{{ include "myapp.fullname" . }}:{{ .Values.postgresql.service.port }}'] # Reference PostgreSQL
   restartPolicy: Never
