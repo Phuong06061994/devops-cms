@@ -1,26 +1,33 @@
-nginx:
-  replicaCount: 1
-  image:
-    repository: nginx
-    tag: "latest"
-  service:
-    type: ClusterIP
-    port: 80
-    targetPort: 80
-
 postgresql:
   enabled: true
   image:
     repository: postgres
     tag: "latest"
-  postgresqlUsername: user
-  postgresqlPassword: password
-  postgresqlDatabase: mydb
+  postgresqlUsername: postgres
+  postgresqlPassword: postgres
+  postgresqlDatabase: my-app
   service:
     type: ClusterIP
     port: 5432
     targetPort: 5432
-    
+backend:
+  image:
+    repository: phuong06061994/java-demo
+    tag: 4ca7ff
+  service:
+    port: 8080
+  url: jdbc:postgresql://postgresql:5432/my-app
+
+frontend:
+  image:
+    repository: phuong06061994/angular-demo
+    tag: 7777
+  service:
+    port: 3000
+    targetPort: 3000
+    type: ClusterIP
+  apiPath: "http://backend:8080"
+
 service:
   type: ClusterIP   # You can change this to NodePort or LoadBalancer if needed
   port: 80          # The port that the service will expose
