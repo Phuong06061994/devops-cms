@@ -4,10 +4,9 @@ metadata:
   name: myapp-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m" # Optional: Customize as needed
 spec:
   rules:
-  - host: localhost
+  - host: myapp.local
     http:
       paths:
       - path: /api
@@ -16,11 +15,11 @@ spec:
           service:
             name: backend
             port:
-              number: {{ .Values.backend.service.port }}
+              number: 8080
       - path: /
         pathType: Prefix
         backend:
           service:
             name: frontend
             port:
-              number: {{ .Values.frontend.service.port }}
+              number: 3000
