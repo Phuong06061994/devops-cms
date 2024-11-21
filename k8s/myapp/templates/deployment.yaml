@@ -38,9 +38,6 @@ spec:
             - containerPort: {{ .Values.backend.service.port }}
         - name: frontend
           image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
-          env:
-            - name: API_PATH
-              value: "{{ .Values.frontend.apiPath }}"
           ports:
             - containerPort: {{ .Values.frontend.service.targetPort }}
         

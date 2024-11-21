@@ -21,12 +21,14 @@ backend:
 frontend:
   image:
     repository: phuong06061994/angular-demo
-    tag: 7777
+    tag: latest
   service:
     port: 3000
-    targetPort: 3000
+    targetPort: 80
     type: ClusterIP
-  apiPath: "http://backend:8080"
+
+ingress:
+  enabled: true
 
 service:
   type: ClusterIP   # You can change this to NodePort or LoadBalancer if needed
@@ -35,12 +37,7 @@ service:
 serviceAccount:
   create: false
   name: ""
-ingress:
-  enabled: false     # Set this to 'false' if you don't want to enable ingress
-  # Optionally, provide other Ingress-related values here
-  name: ""
-  annotations: {}
-  paths: []
+
 autoscaling:
   enabled: false     # Set to 'false' if you don't want to enable autoscaling
   minReplicas: 1    # Minimum number of replicas for autoscaling
