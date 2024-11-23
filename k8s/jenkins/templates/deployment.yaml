@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-and-slaves
+  labels:
+    app: jenkins
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: {{ .Values.containers.jenkinsMaster.name }}
+        image: {{ .Values.containers.jenkinsMaster.image }}
+        ports:
+        {{- range .Values.containers.jenkinsMaster.ports }}
+        - containerPort: {{ .port }}  # Correct reference to .port
+        {{- end }}
+      - name: {{ .Values.containers.javaSlave.name }}
+        image: {{ .Values.containers.javaSlave.image }}
+      - name: {{ .Values.containers.nodeSlave.name }}
+        image: {{ .Values.containers.nodeSlave.image }}

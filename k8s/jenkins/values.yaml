@@ -1,0 +1,53 @@
+replicaCount: 1
+
+containers:
+  jenkinsMaster:
+    selector:
+      app: jenkins-master
+    name: jenkins-master
+    image: jenkins/jenkins:lts
+    resources:
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    type: ClusterIP
+    ports:
+      - name: http
+        port: 8080
+        targetPort: 8080
+      - name: agent
+        port: 50000
+        targetPort: 50000
+
+  javaSlave:
+    name: java-slave
+    image: phuong06061994/java-slave:lastest
+    resources:
+      limits:
+        memory: "512Mi"
+        cpu: "0.5"
+
+  nodeSlave:
+    name: node-slave
+    image: phuong06061994/node-slave:lastest
+    resources:
+      limits:
+        memory: "512Mi"
+        cpu: "0.5"
+
+ingress:
+  enabled: true
+
+service:
+  type: ClusterIP  # Make sure this is a string (ClusterIP, LoadBalancer, etc.)
+  port: 8080
+
+serviceAccount:
+  create: false
+  name: ""
+
+autoscaling:
+  enabled: true  # Enable autoscaling
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
