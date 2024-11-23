@@ -1,0 +1,45 @@
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "latest"
+  postgresqlUsername: postgres
+  postgresqlPassword: postgres
+  postgresqlDatabase: my-app
+  service:
+    type: ClusterIP
+    port: 5432
+    targetPort: 5432
+backend:
+  image:
+    repository: phuong06061994/java-demo
+    tag: 4ca7ff
+  service:
+    port: 8080
+  url: jdbc:postgresql://postgresql:5432/my-app
+
+frontend:
+  image:
+    repository: phuong06061994/angular-demo
+    tag: latest
+  service:
+    port: 3000
+    targetPort: 80
+    type: ClusterIP
+
+ingress:
+  enabled: true
+
+service:
+  type: ClusterIP   # You can change this to NodePort or LoadBalancer if needed
+  port: 80          # The port that the service will expose
+
+serviceAccount:
+  create: false
+  name: ""
+
+autoscaling:
+  enabled: false     # Set to 'false' if you don't want to enable autoscaling
+  minReplicas: 1    # Minimum number of replicas for autoscaling
+  maxReplicas: 5    # Maximum number of replicas for autoscaling
+  targetCPUUtilizationPercentage: 80  # Target CPU utilization percentage
