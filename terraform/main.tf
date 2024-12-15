@@ -49,7 +49,7 @@ resource "google_container_cluster" "my_cluster" {
   initial_node_count = 1
   network            = google_compute_network.vpc_network.self_link  # Use self_link for network
   subnetwork         = google_compute_subnetwork.subnet.self_link    # Use self_link for subnetwork
-
+  remove_default_node_pool = true
   ip_allocation_policy {
     cluster_secondary_range_name  = "pod-ranges"
     services_secondary_range_name = "services-range"  # Directly reference range names
@@ -64,7 +64,7 @@ resource "google_container_node_pool" "linux_pool_1" {
   name     = var.node_pool_1_name
   cluster  = google_container_cluster.my_cluster.name
   location = google_container_cluster.my_cluster.location
-
+  initial_node_count = 1
   node_config {
     image_type = var.node_machine_type  # Use a valid GCP image type
   }
@@ -75,7 +75,7 @@ resource "google_container_node_pool" "linux_pool_2" {
   name     = var.node_pool_2_name
   cluster  = google_container_cluster.my_cluster.name
   location = google_container_cluster.my_cluster.location
-
+  initial_node_count = 1
   node_config {
     image_type = var.node_machine_type  # Use a valid GCP image type
   }

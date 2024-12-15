@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
-  default = "devops-cms-demo"
+  default = "devops-demo"
 }
 
 variable "region" {
