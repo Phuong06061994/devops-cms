@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-notebook
+  namespace: jupyter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter
+  template:
+    metadata:
+      labels:
+        app: jupyter
+    spec:
+      containers:
+      - name: jupyter-notebook
+        image: jupyter/base-notebook:latest
+        ports:
+        - containerPort: 8888
+        volumeMounts:
+        - mountPath: /home/jovyan/work
+          name: jupyter-data
+        env:
+        - name: JUPYTER_TOKEN
+          value: "mysecuretoken"
+      volumes:
+      - name: jupyter-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jupyter-notebook
+  namespace: jupyter
+spec:
+  type: LoadBalancer
+  selector:
+    app: jupyter
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8888

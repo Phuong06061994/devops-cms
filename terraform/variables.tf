@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "Google Cloud project ID"
   type        = string
-  default     = "devops-cms-demo"
+  default     = "demo-devops"
 }
 
 variable "region" {
@@ -68,4 +68,9 @@ variable "node_pool_2_count" {
   description = "Number of nodes in node pool 2"
   type        = number
   default     = 1
+}
+
+variable "base_cidr" {
+  type = string
+  default = "10"
 }

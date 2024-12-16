@@ -1,8 +1,3 @@
-variable "project_id" {
-  description = "The GCP project ID"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "The name of the GKE cluster"
   type        = string
@@ -24,18 +19,6 @@ variable "network_name" {
   description = "network name"
 }
 
-
-
-
-# variable "cluster_secondary_range_name" {
-#   description = "Cluster secondary range name"
-#   type        = string
-# }
-
-# variable "services_secondary_range_name" {
-#   description = "Services secondary range name"
-#   type        = string
-# }
 
 variable "private_subnet_1" {
   description = "Private subnet 1 for nodepool 1"
@@ -59,17 +42,20 @@ variable "node_pool_2_count" {
   default     = 1
 }
 
-
+variable "disk_size_gb_cluster" {
+  type = number
+  default = 50
+}
 variable "disk_size_gb" {
   type = number
-  default = 10
+  default = 100
 }
 variable "disk_type" {
   type = string
   default = "pd-ssd"
 }
 variable "machine_type" {
-  default = "e2-medium"
+  default = "e2-standard-4"
 }
 variable "zone" {
   description = "Zone for zonal resources"
